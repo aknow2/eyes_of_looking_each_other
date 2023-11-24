@@ -107,7 +107,7 @@
             const eyes = document.querySelectorAll('.own');
             eyes.forEach(eye => {
                 const pupil = eye.querySelector('.pupil');
-                pupil.style.transform = `translate(${deltaX/30}px, ${deltaY/30}px)`;
+                pupil.style.transform = `translate(${deltaX/20}px, ${deltaY/20}px)`;
             });
 
             if (isOverlapping(remoteX, remoteY, remoteWidth, remoteHeight)) {
