@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>見つめあう目</title>
+    <style>
+        body, html {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .eye-container {
+            display: flex;
+            justify-content: space-around;
+            width: 250px;
+            height: 100px;
+        }
+
+        .counter-eye-container {
+            position: absolute;
+            left: 1;
+            top: 0;
+            justify-content: space-around;
+            width: 250px;
+            height: 100px;
+            display: none;
+        }
+
+        .own {}
+
+        .counter {}
+
+        .eye {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #000;
+        }
+
+        .pupil {
+            width: 50px;
+            height: 50px;
+            background-color: black;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="eye-container">
+        <div class="eye own">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye own">
+            <div class="pupil"></div>
+        </div>
+    </div>
+    <div class="counter-eye-container">
+        <div class="eye counter">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye counter">
+            <div class="pupil"></div>
+        </div>
+    </div>
+    <script>
+        const channel = new BroadcastChannel('eye_channel');
+
+        const isOverlapping = (x, y, width, height) => {
+            const { outerWidth, outerHeight, screenX, screenY } = window;
+            return x < screenX + outerWidth && screenX < x + width && y < screenY + outerHeight && screenY < y + height;
+        };
+
+        setInterval(() => {
+            const toolbarHeight = window.outerHeight - window.innerHeight;
+            channel.postMessage({ x: window.screenX, y: window.screenY, width: window.outerWidth, height: window.outerHeight, toolbarHeight });
+        }, 100);
+
+        channel.addEventListener('message', (event) => {
+            const { x, y, width, height, toolbarHeight } = event.data;
+            updateEyesPosition(x, y, width, height, toolbarHeight);
+        });
+
+        function updateEyesPosition(remoteX, remoteY, remoteWidth, remoteHeight, toolbarHeight) {
+            const deltaX = (remoteX - window.screenX);
+            const deltaY = (remoteY - window.screenY);
+
+            const eyes = document.querySelectorAll('.own');
+            eyes.forEach(eye => {
+                const pupil = eye.querySelector('.pupil');
+                pupil.style.transform = `translate(${deltaX/30}px, ${deltaY/30}px)`;
+            });
+
+            if (isOverlapping(remoteX, remoteY, remoteWidth, remoteHeight)) {
+                const counterEye = document.querySelector('.counter-eye-container')
+                const x =  deltaX + remoteWidth / 2 - 125;
+                const y = deltaY + remoteHeight / 2 - toolbarHeight
+                counterEye.style.display = 'flex';
+                counterEye.style.left = `${x}px`;
+                counterEye.style.top = `${y}px`;
+                const eyes = document.querySelectorAll('.counter');
+                eyes.forEach(eye => {
+                    const pupil = eye.querySelector('.pupil');
+                    pupil.style.transform = `translate(${-deltaX/30}px, ${-deltaY/30}px)`;
+                });
+            } else {
+                document.querySelector('.counter-eye-container').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
