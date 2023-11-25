@@ -92,30 +92,30 @@
             updateEyesPosition(x, y, width, height, toolbarHeight);
         });
 
-        
 
-        function updateEyesPosition(remoteX, remoteY, remoteWidth, remoteHeight, toolbarHeight) {
-            const screenDeltaX = (remoteX - window.screenX);
-            const screenDeltaY = (remoteY - window.screenY);
-            const remoteCenterX = screenDeltaX + remoteWidth / 2 - 125;
-            const remoteCenterY = screenDeltaY + remoteHeight / 2 - toolbarHeight
-            const localCenterX =  window.innerWidth / 2
-            const localCenterY =  window.innerHeight / 2
-            const deltaX = remoteCenterX - localCenterX;
-            const deltaY = remoteCenterY - localCenterY;
-            
+
+        function updateEyesPosition(remoteScreenX, remoteScreenY, remoteWidth, remoteHeight, toolbarHeight) {
+            const screenDeltaX = (remoteScreenX - window.screenX);
+            const screenDeltaY = (remoteScreenY - window.screenY);
+            const remoteX = screenDeltaX + remoteWidth / 2 - 125;
+            const remoteY = screenDeltaY + (remoteHeight - toolbarHeight) / 2 - 50;
+            const localX =  window.innerWidth / 2 - 125;
+            const localY =  window.innerHeight / 2 - 50;
+            const deltaX = remoteX - localX;
+            const deltaY = remoteY - localY;
+
             const eyes = document.querySelectorAll('.own');
             eyes.forEach(eye => {
                 const pupil = eye.querySelector('.pupil');
                 pupil.style.transform = `translate(${deltaX/20}px, ${deltaY/20}px)`;
             });
 
-            if (isOverlapping(remoteX, remoteY, remoteWidth, remoteHeight)) {
-                const counterEye = document.querySelector('.counter-eye-container')
+            if (isOverlapping(remoteScreenX, remoteScreenY, remoteWidth, remoteHeight)) {
+                const counterEye = document.querySelector('.counter-eye-container');
 
                 counterEye.style.display = 'flex';
-                counterEye.style.left = `${remoteCenterX}px`;
-                counterEye.style.top = `${remoteCenterY}px`;
+                counterEye.style.left = `${remoteX}px`;
+                counterEye.style.top = `${remoteY}px`;
                 const eyes = document.querySelectorAll('.counter');
                 eyes.forEach(eye => {
                     const pupil = eye.querySelector('.pupil');
